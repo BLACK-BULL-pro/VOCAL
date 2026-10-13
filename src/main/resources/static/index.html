@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>V.O.C.A.L. | Práctica Oral en Inglés</title>
+<link rel="icon" href="imagenes/logo.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+
+<!-- 1. CARGA -->
+<section class="screen bg center active" id="splash">
+  <img class="logo lg" src="imagenes/logo.png" alt="Logo V.O.C.A.L.">
+  <h1 class="brand">V.O.C.A.L</h1>
+  <div class="bar"><span id="loadBar"></span></div>
+  <p class="small">LOADING...</p>
+</section>
+
+<!-- 2. LOGIN / REGISTRO -->
+<section class="screen bg center" id="login">
+  <div class="card auth">
+    <img class="logo" src="imagenes/logo.png" alt="">
+    <h1 class="brand sm">V.O.C.A.L.</h1>
+    <p class="tag">Práctica Oral en Inglés</p>
+    <form id="authForm" class="panel" novalidate>
+      <input class="field" id="regName" type="text" placeholder="Nombre completo" autocomplete="name" hidden data-register>
+      <select class="field" id="regLevel" aria-label="Tu nivel de inglés" hidden data-register></select>
+      <input class="field" id="email" type="email" placeholder="✉️  Correo Electrónico" autocomplete="email">
+      <input class="field" id="password" type="password" placeholder="🔒  Contraseña" autocomplete="current-password">
+      <input class="field" id="regConfirmPassword" type="password" placeholder="🔒  Confirmar contraseña" autocomplete="new-password" hidden data-register>
+      <a href="#" class="link" data-action="forgot">Contraseña olvidada?</a>
+      <p class="error" id="authError" role="alert"></p>
+      <button class="btn blue" id="authSubmit" type="submit">Iniciar Sesión</button>
+    </form>
+    <p class="small" id="switchText"></p>
+  </div>
+</section>
+
+<!-- 3. DASHBOARD -->
+<section class="screen dash" id="dashboard">
+  <aside class="side">
+    <img class="logo sm" src="imagenes/logo.png" alt="">
+    <h1 class="brand sm">V.O.C.A.L.</h1>
+    <p class="tag">Práctica Oral en Inglés</p>
+    <nav>
+      <button class="nav on" data-action="nav">INICIO</button>
+      <button class="nav" data-action="nav">MATERIAL DE ESTUDIO</button>
+      <button class="nav" data-action="nav">MIS ESTADÍSTICAS</button>
+      <button class="nav" data-action="nav">COMUNIDAD</button>
+      <button class="nav" data-action="nav">AJUSTES/PERFIL</button>
+      <button class="nav admin-nav" id="adminNav" data-action="nav" hidden>ADMINISTRACIÓN</button>
+    </nav>
+    <div class="icons">
+      <button data-action="bell" aria-label="Notificaciones">🔔</button>
+      <button data-action="account-menu" aria-label="Menú de cuenta" title="Perfil y sesión">👤</button>
+      <button data-action="help" aria-label="Ayuda">❔</button>
+    </div>
+  </aside>
+  <main class="main">
+    <header class="top">
+      <div><h2 id="hello"></h2><span class="chip" id="levelChip"></span></div>
+      <button class="avatar" id="avatar" type="button" data-action="profile" aria-label="Abrir perfil"></button>
+    </header>
+    <div class="hero">
+      <h3>Comienza a practicar sin miedo al qué dirán</h3>
+      <p>Conéctate de forma segura con un compañero de tu mismo nivel y rompe el hielo con temas guiados.</p>
+      <button class="btn green" data-action="start">Iniciar práctica ahora</button>
+    </div>
+    <div class="row">
+      <div class="box grow">
+        <h4>Soporte Estructurado: Temas Sugeridos</h4>
+        <div id="topics" class="chips"></div>
+      </div>
+      <div class="box metric">
+        <h4>Métricas de Progreso</h4>
+        <strong id="hours">0 min</strong>
+        <span>Práctica conversacional acumulada</span>
+      </div>
+    </div>
+    <div id="studyDashboard" class="study-dashboard" hidden></div>
+  </main>
+</section>
+
+<!-- 4. BÚSQUEDA -->
+<section class="screen bg center" id="searching">
+  <div class="card find">
+    <div class="pair"><span class="avatar sm" id="findAvatar"></span><i></i><span class="avatar sm q">?</span></div>
+    <h3 id="findText"></h3>
+    <button class="btn red" data-action="cancel">Cancelar Búsqueda</button>
+  </div>
+</section>
+
+<!-- 5. SALA DE VIDEOLLAMADA (70% video / 30% herramientas) -->
+<section class="screen room" id="room">
+  <div class="stage">
+    <div class="tiles">
+      <div class="tile" id="localTile">
+        <video id="localVideo" autoplay muted playsinline></video>
+        <span class="ph">👤</span><span class="name" id="localName"></span>
+      </div>
+      <div class="tile" id="remoteTile">
+        <!-- Aquí se inyecta el stream remoto (WebRTC / PeerJS) -->
+        <video id="remoteVideo" autoplay playsinline></video>
+        <span class="ph">👤</span><span class="name" id="remoteName"></span>
+      </div>
+    </div>
+    <div class="controls">
+      <button class="pill" id="micBtn" data-action="mic">🎤 Microphone on</button>
+      <button class="pill" id="camBtn" data-action="cam">📷 Camera on</button>
+      <button class="btn red" data-action="end">End practice</button>
+      <span class="clock" id="clock">00:00</span>
+    </div>
+  </div>
+  <aside class="tools">
+    <button class="room-language-toggle" id="roomLanguageToggle" type="button" data-action="room-language" aria-label="Switch room to Spanish" title="Switch room to Spanish">ES</button>
+    <div class="room-tabs" role="tablist" aria-label="Herramientas de conversación">
+      <button class="room-tab active" role="tab" aria-selected="true" data-action="room-tab" data-tab="guide">🗣️ Conversation guide</button>
+      <button class="room-tab" role="tab" aria-selected="false" data-action="room-tab" data-tab="chat">💬 Chat <span id="chatBadge" hidden>0</span></button>
+    </div>
+    <section class="room-panel" id="guidePanel" role="tabpanel">
+      <h3>🗣️ Guided topic of the day</h3>
+      <p class="topic" id="topicText"></p>
+      <div class="question-phase" id="questionPhase">Warm-up</div>
+      <div class="question-roles" id="questionRoles" hidden></div>
+      <h4 class="icebreaker-heading">Icebreaker questions</h4>
+      <p class="question-counter" id="questionCounter"></p>
+      <ol id="questions" class="qs"></ol>
+      <div class="question-timer" aria-label="Tiempo de la pregunta"><span id="questionProgress"></span></div>
+      <p class="question-elapsed" id="questionElapsed">Question 1 · 00:00</p>
+      <div class="question-actions"><button class="btn blue start-question" data-action="start-question">Start question</button><button class="btn blue next-question" data-action="next-question" disabled>Next question →</button></div>
+    </section>
+    <section class="room-panel chat-panel" id="chatPanel" role="tabpanel" hidden>
+      <div class="chat-heading"><div><h3>💬 Practice chat</h3><p>Share vocabulary or type if your audio stops working.</p></div><span class="chat-status" id="chatStatus">In this room</span></div>
+      <div class="chat-messages" id="chatMessages" role="log" aria-live="polite" aria-label="Mensajes de la sala"></div>
+      <form class="chat-form" id="chatForm"><label class="sr-only" for="chatInput">Message</label><input id="chatInput" maxlength="300" autocomplete="off" placeholder="Type a message…"><button class="btn blue" type="submit" aria-label="Send message">Send</button></form>
+      <p class="chat-note">Messages and questions sync across browser tabs using the same topic.</p>
+    </section>
+    <div class="toolbox" id="toolBox" hidden>
+      <div id="translator" hidden>
+        <div class="translator-head"><strong>Quick translator</strong><button id="trDirection" class="direction-switch" type="button" data-direction="es|en" data-action="translation-direction" aria-label="Switch translation direction">ES → EN</button></div>
+        <label class="sr-only" for="trIn">Text to translate</label><textarea id="trIn" rows="2" placeholder="Type a phrase in Spanish…"></textarea>
+        <button class="btn blue" data-action="translate">Translate to English</button>
+        <p id="trOut"></p>
+      </div>
+      <p id="hintOut" hidden></p>
+    </div>
+    <button class="soft" type="button" aria-expanded="false" aria-controls="toolBox" data-action="tool" data-t="translator">🌐 Quick live translator <span class="tool-chevron" aria-hidden="true">＋</span></button>
+    <button class="soft" type="button" aria-expanded="false" aria-controls="toolBox" data-action="tool" data-t="hint">💡 Vocabulary & synonym hint <span class="tool-chevron" aria-hidden="true">＋</span></button>
+  </aside>
+</section>
+
+<!-- 6. FIN DE PRÁCTICA -->
+<section class="screen bg center" id="summary">
+  <div class="card done">
+    <div class="big">🎉</div>
+    <h3>¡Práctica Finalizada con Éxito!</h3>
+    <p class="small dark">Has completado tu sesión conversacional de manera segura y fluida.</p>
+    <div class="stats">
+      <div><b id="sumMin"></b><span>Tiempo de práctica</span></div>
+      <div><b id="sumLvl"></b><span>Fluidez válida</span></div>
+    </div>
+    <p class="small">¿Cómo calificarías la experiencia con tu compañero?</p>
+    <div class="stars" id="stars">
+      <button data-action="rate" data-n="1" aria-label="1 estrella">★</button><button data-action="rate" data-n="2" aria-label="2 estrellas">★</button><button data-action="rate" data-n="3" aria-label="3 estrellas">★</button><button data-action="rate" data-n="4" aria-label="4 estrellas">★</button><button data-action="rate" data-n="5" aria-label="5 estrellas">★</button>
+    </div>
+    <button class="btn green" data-action="home">Volver al Dashboard</button>
+  </div>
+</section>
+
+<div id="quickPanel" class="quick-panel" hidden></div>
+<div id="toast" role="status"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/sockjs-client@1.6.1/dist/sockjs.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@stomp/stompjs@7.1.1/bundles/stomp.umd.min.js"></script>
+<script src="js/data.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>

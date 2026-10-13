@@ -1,0 +1,23 @@
+services:
+  - type: web
+    name: vocal
+    runtime: docker
+    plan: free
+    healthCheckPath: /
+    envVars:
+      - key: SPRING_DATASOURCE_URL
+        sync: false
+      - key: SPRING_DATASOURCE_USERNAME
+        sync: false
+      - key: SPRING_DATASOURCE_PASSWORD
+        sync: false
+      - key: SPRING_DATASOURCE_DRIVER
+        value: org.postgresql.Driver
+      - key: VOCAL_ALLOWED_ORIGINS
+        sync: false
+      - key: VOCAL_ADMIN_EMAIL
+        sync: false
+      - key: VOCAL_ADMIN_PASSWORD
+        sync: false
+      - key: VOCAL_ADMIN_NAME
+        value: Administrador V.O.C.A.L.
