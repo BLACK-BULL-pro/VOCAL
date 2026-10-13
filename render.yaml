@@ -5,6 +5,8 @@ services:
     plan: free
     healthCheckPath: /
     envVars:
+      - key: SPRING_PROFILES_ACTIVE
+        value: render
       - key: SPRING_DATASOURCE_HOST
         fromDatabase:
           name: vocal-db
