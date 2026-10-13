@@ -5,12 +5,26 @@ services:
     plan: free
     healthCheckPath: /
     envVars:
-      - key: SPRING_DATASOURCE_URL
-        sync: false
+      - key: SPRING_DATASOURCE_HOST
+        fromDatabase:
+          name: vocal-db
+          property: host
+      - key: SPRING_DATASOURCE_PORT
+        fromDatabase:
+          name: vocal-db
+          property: port
+      - key: SPRING_DATASOURCE_DB
+        fromDatabase:
+          name: vocal-db
+          property: database
       - key: SPRING_DATASOURCE_USERNAME
-        sync: false
+        fromDatabase:
+          name: vocal-db
+          property: user
       - key: SPRING_DATASOURCE_PASSWORD
-        sync: false
+        fromDatabase:
+          name: vocal-db
+          property: password
       - key: SPRING_DATASOURCE_DRIVER
         value: org.postgresql.Driver
       - key: VOCAL_ALLOWED_ORIGINS
@@ -21,3 +35,9 @@ services:
         sync: false
       - key: VOCAL_ADMIN_NAME
         value: Administrador V.O.C.A.L.
+
+databases:
+  - name: vocal-db
+    databaseName: vocal
+    user: vocal
+    plan: free
