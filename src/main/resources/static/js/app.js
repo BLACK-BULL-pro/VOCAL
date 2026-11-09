@@ -561,6 +561,7 @@
     $('#remoteName').textContent = state.partner ? `${state.partner.name} · ${state.partner.level}` : `Waiting for a partner (${u.level})`;
     $('#micBtn').textContent = '🎤 Microphone on'; $('#camBtn').textContent = '📷 Camera on';
     ['#micBtn', '#camBtn'].forEach((b) => $(b).classList.remove('off'));
+    updateMediaStatus(true, true);
     $('#toolBox').hidden = true; state.hint = 0;
     $$('.soft[data-t]').forEach((button) => { button.setAttribute('aria-expanded', 'false'); button.querySelector('.tool-chevron').textContent = '＋'; });
     $('#chatMessages').replaceChildren(); $('#chatBadge').hidden = true; state.chatUnread = 0;
@@ -592,9 +593,14 @@
         sentKinds.add(track.kind);
       });
       state.stream.getTracks().forEach((track) => track.addEventListener('ended', () => {
-        if (!state.finishing && $('#room').classList.contains('active')) toast(`${track.kind === 'audio' ? 'Your microphone' : 'Your camera'} was disconnected.`);
+        if (!state.finishing && $('#room').classList.contains('active')) {
+          const label = track.kind === 'audio' ? 'Microphone' : 'Camera';
+          toast(`${label} disconnected.`);
+          updateMediaStatus(getMediaEnabled('audio'), getMediaEnabled('video'), `${label} disconnected`);
+        }
       }));
     }
+    updateMediaStatus(getMediaEnabled('audio'), getMediaEnabled('video'), state.stream ? '' : 'Camera and microphone unavailable');
     for (const kind of ['audio', 'video']) {
       if (!sentKinds.has(kind)) state.peer.addTransceiver(kind, { direction: 'recvonly' });
     }
@@ -749,6 +755,22 @@
     item.append(author, body, time); $('#chatMessages').append(item); $('#chatMessages').scrollTop = $('#chatMessages').scrollHeight;
     if (!own && $('#chatPanel').hidden) { state.chatUnread++; $('#chatBadge').textContent = state.chatUnread; $('#chatBadge').hidden = false; }
   }
+  function getMediaEnabled(kind) {
+    return !!state.stream?.getTracks().find((track) => track.kind === kind && track.readyState === 'live' && track.enabled);
+  }
+  function updateMediaStatus(microphoneOn, cameraOn, message = '') {
+    const status = $('#mediaStatus');
+    if (!status) return;
+    if (message) {
+      status.textContent = message;
+      status.classList.toggle('is-off', !microphoneOn || !cameraOn);
+      status.classList.add('is-warning');
+      return;
+    }
+    status.textContent = [microphoneOn ? 'Microphone on' : 'Microphone off', cameraOn ? 'Camera on' : 'Camera off'].join(' · ');
+    status.classList.toggle('is-off', !microphoneOn || !cameraOn);
+    status.classList.remove('is-warning');
+  }
   function sendChatMessage(event) {
     event.preventDefault(); const input = $('#chatInput'), text = input.value.trim(); if (!text) return;
     const message = { text, author: state.user?.name || 'Student', time: Date.now() };
@@ -761,6 +783,8 @@
     btn.classList.toggle('off', !on);
     btn.textContent = kind === 'audio' ? `🎤 Microphone ${on ? 'on' : 'off'}` : `📷 Camera ${on ? 'on' : 'off'}`;
     if (kind === 'video') $('#localTile').classList.toggle('live', on);
+    updateMediaStatus(getMediaEnabled('audio'), getMediaEnabled('video'));
+    toast(`${kind === 'audio' ? 'Microphone' : 'Camera'} ${on ? 'activated' : 'deactivated'}.`);
   }
   function tool(name) {
     const box = $('#toolBox'), tr = $('#translator'), hint = $('#hintOut');

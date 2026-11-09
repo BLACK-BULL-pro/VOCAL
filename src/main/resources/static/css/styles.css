@@ -79,6 +79,10 @@ button{font:inherit;cursor:pointer;border:0;background:none;color:inherit}
 .controls{display:flex;justify-content:center;align-items:center;gap:22px;flex-wrap:wrap}
 .pill{background:#1e3a66;color:#fff;padding:14px 28px;border-radius:999px;font-weight:800;font-size:1.05rem}
 .pill.off{background:#5a2330;text-decoration:line-through}
+.media-status{display:inline-flex;align-items:center;gap:6px;color:#d8e6f8;font-size:.78rem;font-weight:800;min-height:24px}
+.media-status::before{content:'●';color:#5ee18c;font-size:.72rem}
+.media-status.is-off::before{color:#ff7180}
+.media-status.is-warning::before{color:#ffd166}
 .controls .btn{padding:12px 26px}
 .clock{color:#9fb6d8;font-weight:800;font-variant-numeric:tabular-nums}
 .tools{flex:3;background:#fff;padding:20px 16px;display:flex;flex-direction:column;gap:14px;min-width:260px;min-height:0;overflow-x:hidden;overflow-y:auto;overscroll-behavior:contain}
