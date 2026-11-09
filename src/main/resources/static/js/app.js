@@ -496,7 +496,7 @@
     const u = state.user;
     state.finishing = false;
     state.searching = true;
-    $('#findAvatar').textContent = u.name[0].toUpperCase();
+    setAvatarPhoto('#findAvatar', u.photo, u.name);
     $('#findText').textContent = `Connecting to find a conversation partner at your level: ${levels[u.level]} (${u.level})`;
     show('searching');
     ensureSignalingConnection();
@@ -545,7 +545,7 @@
     const u = state.user;
     if (!match?.roomId) return;
     state.roomId = match.roomId;
-    state.partner = match.partnerName ? { name: match.partnerName, level: match.partnerLevel || u.level } : null;
+    state.partner = match.partnerName ? { name: match.partnerName, level: match.partnerLevel || u.level, photo: match.partnerPhoto || null } : null;
     state.localRoleIsA = !!match.initiator;
     const availableTopics = topics.filter((topic) => topic.levels?.includes(u.level));
     if (!availableTopics.length) { toast('There are no suggested topics for your level yet.'); dashboard(); return; }
@@ -559,6 +559,8 @@
     renderCurrentQuestion();
     $('#localName').textContent = `${u.name} (You) - ${u.level}`;
     $('#remoteName').textContent = state.partner ? `${state.partner.name} · ${state.partner.level}` : `Waiting for a partner (${u.level})`;
+    setAvatarPhoto('#localPlaceholder', u.photo, u.name);
+    setAvatarPhoto('#remotePlaceholder', state.partner?.photo, state.partner?.name || 'Partner');
     $('#micBtn').textContent = '🎤 Microphone on'; $('#camBtn').textContent = '📷 Camera on';
     ['#micBtn', '#camBtn'].forEach((b) => $(b).classList.remove('off'));
     updateMediaStatus(true, true);
@@ -731,6 +733,10 @@
     }
     if (signal.type === 'QUESTION_START' && signal.payload?.index === state.questionIndex) { startQuestion(true); return; }
     if (signal.type === 'PARTNER_LEFT') { $('#remoteTile').classList.remove('live'); $('#remoteVideo').srcObject = null; $('#remoteName').textContent = state.partner ? `${state.partner.name} disconnected` : `Partner disconnected (${state.user.level})`; toast('Your partner left the room.'); return; }
+    if (signal.type === 'MEDIA_STATUS' && signal.sender !== state.user.email && signal.payload?.kind === 'video') {
+      $('#remoteTile').classList.toggle('live', !!signal.payload.enabled);
+      return;
+    }
     const peer = state.peer; if (!peer) return;
     try {
       if (signal.type === 'OFFER') {
@@ -758,6 +764,19 @@
   function getMediaEnabled(kind) {
     return !!state.stream?.getTracks().find((track) => track.kind === kind && track.readyState === 'live' && track.enabled);
   }
+  function setAvatarPhoto(selector, photo, name = 'User') {
+    const avatar = $(selector);
+    if (!avatar) return;
+    avatar.replaceChildren();
+    if (photo) {
+      const image = document.createElement('img');
+      image.src = photo;
+      image.alt = `Foto de ${name}`;
+      avatar.append(image);
+    } else {
+      avatar.textContent = name.trim()[0]?.toUpperCase() || '?';
+    }
+  }
   function updateMediaStatus(microphoneOn, cameraOn, message = '') {
     const status = $('#mediaStatus');
     if (!status) return;
@@ -783,6 +802,7 @@
     btn.classList.toggle('off', !on);
     btn.textContent = kind === 'audio' ? `🎤 Microphone ${on ? 'on' : 'off'}` : `📷 Camera ${on ? 'on' : 'off'}`;
     if (kind === 'video') $('#localTile').classList.toggle('live', on);
+    if (kind === 'video') sendRoomEvent('MEDIA_STATUS', { kind: 'video', enabled: on });
     updateMediaStatus(getMediaEnabled('audio'), getMediaEnabled('video'));
     toast(`${kind === 'audio' ? 'Microphone' : 'Camera'} ${on ? 'activated' : 'deactivated'}.`);
   }

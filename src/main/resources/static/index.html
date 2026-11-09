@@ -99,12 +99,12 @@
     <div class="tiles">
       <div class="tile" id="localTile">
         <video id="localVideo" autoplay muted playsinline></video>
-        <span class="ph">👤</span><span class="name" id="localName"></span>
+        <span class="ph" id="localPlaceholder">👤</span><span class="name" id="localName"></span>
       </div>
       <div class="tile" id="remoteTile">
         <!-- Aquí se inyecta el stream remoto (WebRTC / PeerJS) -->
         <video id="remoteVideo" autoplay playsinline></video>
-        <span class="ph">👤</span><span class="name" id="remoteName"></span>
+        <span class="ph" id="remotePlaceholder">👤</span><span class="name" id="remoteName"></span>
       </div>
     </div>
     <div class="controls">

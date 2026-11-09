@@ -35,12 +35,12 @@ public class MatchmakingService {
     public void search(String email, String requestedLevel, String requestedTopicId) {
         String level = requestedLevel == null ? "" : requestedLevel.toUpperCase();
         if (!LEVELS.contains(level)) {
-            sendMatch(email, new MatchMessage("ERROR", null, false, null, null, null, "Unsupported student level."));
+            sendMatch(email, new MatchMessage("ERROR", null, false, null, null, null, null, "Unsupported student level."));
             return;
         }
         String topicId = requestedTopicId == null ? "" : requestedTopicId.trim();
         if (topicId.isBlank() || topicId.length() > 100 || !topicId.matches("[a-zA-Z0-9._-]+")) {
-            sendMatch(email, new MatchMessage("ERROR", null, false, null, null, null, "Choose a valid conversation topic."));
+            sendMatch(email, new MatchMessage("ERROR", null, false, null, null, null, null, "Choose a valid conversation topic."));
             return;
         }
         synchronized (queueLock) {
@@ -50,7 +50,7 @@ public class MatchmakingService {
             while (partner != null && partner.userId().equals(email)) partner = queue.pollFirst();
             if (partner == null) {
                 queue.addLast(new QueueEntry(email));
-                sendMatch(email, new MatchMessage("WAITING", null, false, topicId, null, null, "Waiting for a student with your level and topic."));
+                sendMatch(email, new MatchMessage("WAITING", null, false, topicId, null, null, null, "Waiting for a student with your level and topic."));
                 return;
             }
             String roomId = UUID.randomUUID().toString();
@@ -63,15 +63,15 @@ public class MatchmakingService {
             User currentUser = users.findById(email).orElse(null);
             User partnerUser = users.findById(partner.userId()).orElse(null);
             sendMatch(partner.userId(), new MatchMessage("MATCH_FOUND", roomId, false, topicId,
-                    displayName(currentUser, email), level, null));
+                    displayName(currentUser, email), level, photo(currentUser), null));
             sendMatch(email, new MatchMessage("MATCH_FOUND", roomId, true, topicId,
-                    displayName(partnerUser, partner.userId()), level, null));
+                    displayName(partnerUser, partner.userId()), level, photo(partnerUser), null));
         }
     }
 
     public void cancel(String email) {
         synchronized (queueLock) { removeFromQueues(email); }
-        sendMatch(email, new MatchMessage("CANCELLED", null, false, null, null, null, null));
+        sendMatch(email, new MatchMessage("CANCELLED", null, false, null, null, null, null, null));
     }
 
     public void relay(String email, String roomId, String type, Object payload) {
@@ -134,8 +134,10 @@ public class MatchmakingService {
         return user == null || user.getName() == null || user.getName().isBlank() ? fallback : user.getName();
     }
 
+    private String photo(User user) { return user == null ? null : user.getPhoto(); }
+
     public record MatchMessage(String type, String roomId, boolean initiator, String topicId,
-                               String partnerName, String partnerLevel, String detail) { }
+                               String partnerName, String partnerLevel, String partnerPhoto, String detail) { }
     private record QueueEntry(String userId) { }
     private record MatchKey(String level, String topicId) { }
     public record RoomSignal(String roomId, String type, Object payload, String sender) { }

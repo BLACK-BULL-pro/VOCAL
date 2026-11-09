@@ -73,6 +73,10 @@ button{font:inherit;cursor:pointer;border:0;background:none;color:inherit}
 .tile{position:relative;background:#0c2a52;border-radius:8px;display:grid;place-items:center;overflow:hidden;min-height:260px}
 .tile video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:none}
 .tile.live video{display:block}.tile.live .ph{display:none}
+.tile .ph{width:100%;height:100%;display:grid;place-items:center;overflow:hidden}
+.tile .ph img{width:100%;height:100%;object-fit:cover}
+#findAvatar{overflow:hidden}
+#findAvatar img{width:100%;height:100%;object-fit:cover;border-radius:50%}
 #localVideo{transform:scaleX(-1)}
 .ph{font-size:5rem;opacity:.85}
 .name{position:absolute;left:16px;bottom:16px;background:#000;color:#fff;padding:12px 18px;border-radius:999px;font-size:.78rem;font-weight:800}
